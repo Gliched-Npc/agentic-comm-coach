@@ -1,10 +1,11 @@
 import os
+import re
 import time
 from collections import Counter
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from google.genai.errors import ServerError
+from google.genai.errors import ServerError, ClientError
 from app.schemas import IntentResult, Intent
 
 load_dotenv()
@@ -51,12 +52,12 @@ def sanity_check(intent: str, message: str) -> bool:
     return any(k in message.lower() for k in keywords)
 
 
-def _single_classify(message: str, max_retries: int = 3) -> IntentResult:
+def _single_classify(message: str, max_retries: int = 4) -> IntentResult:
     last_error = None
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-3.6-flash",
+                model="gemini-flash-lite-latest",
                 contents=f"{SYSTEM_PROMPT}\n\nUser message: {message}",
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -64,11 +65,22 @@ def _single_classify(message: str, max_retries: int = 3) -> IntentResult:
                 ),
             )
             return IntentResult.model_validate_json(response.text)
+
+        except ClientError as e:
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                match = re.search(r"retry in (\d+\.?\d*)s", str(e))
+                wait = float(match.group(1)) + 2 if match else 60
+                print(f"  [rate limited] waiting {wait:.0f}s before retry {attempt+1}/{max_retries}...")
+                time.sleep(wait)
+                last_error = e
+                continue
+            raise  
         except ServerError as e:
-            last_error = e
-            wait = 2 ** attempt  # 1s, 2s, 4s
-            print(f"  [retry {attempt+1}/{max_retries}] server busy, waiting {wait}s...")
+            wait = 2 ** attempt
+            print(f"  [server busy] retry {attempt+1}/{max_retries}, waiting {wait}s...")
             time.sleep(wait)
+            last_error = e
+
     raise last_error
 
 
