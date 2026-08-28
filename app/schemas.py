@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Literal
 from enum import Enum
 
 
@@ -17,7 +17,7 @@ class Intent(str, Enum):
 class IntentResult(BaseModel):
     reasoning: str
     intent: Intent
-    confidence: float
+    confidence_level: Literal["low", "medium", "high"]
 
 
 class PlanStep(BaseModel):
@@ -52,3 +52,4 @@ class ChatTurn(BaseModel):
     role: str
     content: str
     intent: Optional[Intent] = None
+    
