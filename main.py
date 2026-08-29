@@ -26,7 +26,7 @@ def chat(payload: UserMessageRequest):
     try:
         intent_result = classify_intent(user_text)
         tool_handler = TOOL_REGISTRY.get(intent_result.intent, handle_unclear)
-        return tool_handler(user_text)
+        return tool_handler(user_text,intent_result.intent)
 
     except (ClientError, ServerError):
         return CoachResponse(
