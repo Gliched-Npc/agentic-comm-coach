@@ -13,6 +13,8 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 INTENT_MODEL = "gemini-flash-lite-latest"#"gemini-flash-latest" "gemini-3.6-flash" or 
 
+MAX_WAIT_SEC=20
+
 SYSTEM_PROMPT = """You are an intent classifier for a communication coaching agent.
 
 First explain your reasoning, then classify into exactly one of:
@@ -90,7 +92,8 @@ def _single_classify(message: str, max_retries: int = 4) -> IntentResult:
         except ClientError as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
                 match = re.search(r"retry in (\d+\.?\d*)s", str(e))
-                wait = float(match.group(1)) + 2 if match else 60
+                rqst_wait = float(match.group(1)) + 2 if match else 60
+                wait=min(rqst_wait,MAX_WAIT_SEC)
                 print(f"  [rate limited] waiting {wait:.0f}s before retry {attempt+1}/{max_retries}...")
                 time.sleep(wait)
                 last_error = e
@@ -98,7 +101,7 @@ def _single_classify(message: str, max_retries: int = 4) -> IntentResult:
             raise
 
         except ServerError as e:
-            wait = 2 ** attempt
+            wait = min(2 ** attempt,MAX_WAIT_SEC)
             print(f"  [server busy] retry {attempt+1}/{max_retries}, waiting {wait}s...")
             time.sleep(wait)
             last_error = e

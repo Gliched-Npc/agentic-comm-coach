@@ -1,8 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-
 from app.llm_client import call_gemini
 
 EMAIL_SYSTEM_PROMPT = """You are an executive communication coach specializing in workplace email strategy and drafting.
@@ -31,32 +26,6 @@ Deliver direct, high-impact responses without meta-introductions.
 
 
 def generate_email(message: str) -> str:
-    prompt = f"{EMAIL_SYSTEM_PROMPT}\n\nUser request: {message}"
+    prompt = f"{EMAIL_SYSTEM_PROMPT}\n\nUser message: {message}"
     response = call_gemini(prompt)
     return response.text
-
-
-if __name__ == "__main__":
-    print("=" * 60)
-    print(" Agentic Communication Coach - Email Generation Tool")
-    print("=" * 60)
-    print("Type your email request below (or type 'exit' to quit).\n")
-
-    while True:
-        try:
-            user_input = input("Enter request: ").strip()
-            if not user_input:
-                continue
-            if user_input.lower() in ("exit", "quit", "q"):
-                print("\nGoodbye!")
-                break
-
-            print("\n Generating email draft & coaching advice\n")
-            result = generate_email(user_input)
-            print("-" * 60)
-            print(result)
-            print("-" * 60 + "\n")
-        except (KeyboardInterrupt, EOFError):
-            print("\nExiting...")
-            break
-

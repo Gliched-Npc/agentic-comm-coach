@@ -6,9 +6,9 @@ from app.tools.interview_coaching import interview_coaching
 from app.tools.tone_analysis import tone_analysis
 
 def handle_email_writing(message: str) -> CoachResponse:
-    draft = generate_email(message)
+    result = generate_email(message)
     return CoachResponse(
-        response=draft,
+        response=result,
         intent=Intent.EMAIL_WRITING,
         clarify_pending=False,
         awaiting_followup=False
