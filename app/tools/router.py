@@ -47,7 +47,13 @@ def handle_conversation_improvement(message: str,intent:Intent) -> CoachResponse
 
 def handle_unclear(message: str,intent:Intent) -> CoachResponse:
     return CoachResponse(
-        response="I'm not quite sure how to help with that. Could you clarify if you want help drafting an email, preparing for an interview, fixing grammar, or adjusting tone?",
+        response=(
+        "I'm not quite sure what kind of communication help you're looking for.\n\n"
+        "Could you tell me a bit more? For example:\n"
+        "- Are you trying to write something (an email, a message)?\n"
+        "- Are you preparing for a conversation (an interview, a difficult talk)?\n"
+        "- Do you want feedback on how something comes across?"
+        ),
         intent=intent,
         clarify_pending=True,
         awaiting_followup=False
