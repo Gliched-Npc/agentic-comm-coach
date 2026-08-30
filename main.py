@@ -1,13 +1,13 @@
 ﻿import uuid
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from google.genai.errors import ServerError, ClientError
 from app.planner import classify_intent
 from app.tools.router import TOOL_REGISTRY, handle_unclear
 from app.tools.communication_scoring import score_communication
 from app.memory import get_history, append_turn
-from app.schemas import CoachResponse, Intent, ScoringResult
+from app.schemas import CoachResponse, Intent, ScoringResult, ChatTurn
 
 app = FastAPI(title="Agentic Communication Coach")
 
@@ -53,6 +53,14 @@ def chat(payload: UserMessageRequest):
             clarify_pending=False,
             awaiting_followup=False,
         )
+
+
+@app.get("/coach/history/{session_id}", response_model=List[ChatTurn])
+def history(session_id: str):
+    turns = get_history(session_id, limit=50)
+    if not turns:
+        raise HTTPException(status_code=404, detail="No history found for this session_id.")
+    return turns
 
 
 @app.post("/coach/analyze", response_model=ScoringResult)
