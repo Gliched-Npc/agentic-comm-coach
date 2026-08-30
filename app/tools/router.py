@@ -1,6 +1,6 @@
 ﻿# app/tools/router.py
-from typing import Callable, Dict
-from app.schemas import Intent, CoachResponse
+from typing import Callable, Dict, List
+from app.schemas import Intent, CoachResponse,ChatTurn
 from app.tools.email_gen import generate_email
 from app.tools.interview_coaching import interview_coaching
 from app.tools.tone_analysis import tone_analysis
@@ -8,8 +8,8 @@ from app.tools.conversation_improvement import conversation_improvement
 from app.tools.grammar_correction import grammar_correction
 
 
-def handle_email_writing(message: str,intent:Intent, session_id: str) -> CoachResponse:
-    result = generate_email(message)
+def handle_email_writing(message: str,intent:Intent, session_id: str, history: List[ChatTurn] = None) -> CoachResponse:
+    result = generate_email(message, history=history)
     return CoachResponse(
         response=result,
         intent=intent,
@@ -18,8 +18,8 @@ def handle_email_writing(message: str,intent:Intent, session_id: str) -> CoachRe
         awaiting_followup=False
     )
 
-def handle_interview_practice(message: str,intent:Intent, session_id: str) -> CoachResponse:
-    result = interview_coaching(message)
+def handle_interview_practice(message: str,intent:Intent, session_id: str, history: List[ChatTurn] = None) -> CoachResponse:
+    result = interview_coaching(message, history=history)
     return CoachResponse(
         response=result,
         intent=intent,
@@ -29,8 +29,8 @@ def handle_interview_practice(message: str,intent:Intent, session_id: str) -> Co
     )
 
 
-def handle_tone_improvement(message: str,intent:Intent, session_id: str) -> CoachResponse:
-    result = tone_analysis(message)
+def handle_tone_improvement(message: str,intent:Intent, session_id: str, history: List[ChatTurn] = None) -> CoachResponse:
+    result = tone_analysis(message, history=history)
     return CoachResponse(
         response=result,
         intent=intent,
@@ -40,8 +40,8 @@ def handle_tone_improvement(message: str,intent:Intent, session_id: str) -> Coac
     )
 
 
-def handle_conversation_improvement(message: str,intent:Intent, session_id: str) -> CoachResponse:
-    result = conversation_improvement(message)
+def handle_conversation_improvement(message: str,intent:Intent, session_id: str, history: List[ChatTurn] = None) -> CoachResponse:
+    result = conversation_improvement(message, history=history)
     return CoachResponse(
         response=result,
         intent=intent,
@@ -50,8 +50,8 @@ def handle_conversation_improvement(message: str,intent:Intent, session_id: str)
         awaiting_followup=False
     )
 
-def handle_grammar_correction(message:str,intent:Intent, session_id: str) -> CoachResponse:
-    result = grammar_correction(message)
+def handle_grammar_correction(message:str,intent:Intent, session_id: str, history: List[ChatTurn] = None) -> CoachResponse:
+    result = grammar_correction(message, history=history)
     return CoachResponse(
         response=result,
         intent=intent,
@@ -60,7 +60,7 @@ def handle_grammar_correction(message:str,intent:Intent, session_id: str) -> Coa
         awaiting_followup=False
     )
 
-def handle_unclear(message: str,intent:Intent, session_id: str) -> CoachResponse:
+def handle_unclear(message: str,intent:Intent, session_id: str, history: List[ChatTurn] = None) -> CoachResponse:
     return CoachResponse(
         response=(
         "I'm not quite sure what kind of communication help you're looking for.\n\n"

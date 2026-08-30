@@ -1,4 +1,4 @@
-from app.llm_client import call_gemini
+﻿from app.llm_client import call_gemini,format_history_context
 
 CONVERSATION_SYSTEM_PROMPT = """You are a communication coach helping someone improve
 how they handle a specific real-world communication situation.
@@ -32,7 +32,8 @@ just respond with the appropriate coaching directly.
 """
 
 
-def conversation_improvement(message: str) -> str:
-    prompt = f"{CONVERSATION_SYSTEM_PROMPT}\n\nUser message: {message}"
+def conversation_improvement(message: str, history: list = None) -> str:
+    history_context = format_history_context(history)
+    prompt = f"{CONVERSATION_SYSTEM_PROMPT}{history_context}\n\nUser message: {message}"
     response = call_gemini(prompt)
     return response.text

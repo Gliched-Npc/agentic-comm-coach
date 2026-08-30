@@ -1,4 +1,4 @@
-from app.llm_client import call_gemini
+﻿from app.llm_client import call_gemini, format_history_context
 
 GRAMMAR_SYSTEM_PROMPT = """You are a grammar and writing correction assistant.
 
@@ -13,7 +13,8 @@ Keep it focused: the correction first, then a short list of what changed and why
 """
 
 
-def grammar_correction(message: str) -> str:
-    prompt = f"{GRAMMAR_SYSTEM_PROMPT}\n\nUser text: {message}"
+def grammar_correction(message: str, history: list = None) -> str:
+    history_context = format_history_context(history)
+    prompt = f"{GRAMMAR_SYSTEM_PROMPT}{history_context}\n\nUser text: {message}"
     response = call_gemini(prompt)
     return response.text

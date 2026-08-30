@@ -12,6 +12,17 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 MAX_WAIT_SEC = 20
 
 
+def format_history_context(history: list = None) -> str:
+    if not history:
+        return ""
+    lines = "\n".join(f"{turn.role}: {turn.content}" for turn in history)
+    return (
+        f"\n\nRecent conversation (for context - if the new message refers to "
+        f"something already discussed or produced above, apply the requested "
+        f"change to that specific thing rather than starting fresh):\n{lines}\n"
+    )
+
+
 def call_gemini(prompt: str, model: str = "gemini-flash-lite-latest", max_retries: int = 2, response_schema=None):
     last_error = None
     config = None

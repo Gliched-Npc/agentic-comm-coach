@@ -27,6 +27,12 @@ Confidence level (use these, don't guess):
 - low: vague, multiple intents plausible, or not enough info
 
 Known collisions - use these rules when words overlap across categories:
+- If recent conversation history shows a specific deliverable was just produced (an
+  email draft, a rewritten message, corrected text) and the new message asks to
+  modify it ("make it more formal", "make it shorter", "change X to Y") without
+  introducing a new topic, KEEP the same intent that produced that deliverable -
+  do not switch to Tone Improvement, Grammar Correction, etc. just because the
+  editing instruction sounds like that category in isolation.
 - "weakness", "strength", "practice", "practice for" + any reference to answering
   or being asked something -> Interview Practice, NOT Conflict Resolution or Public Speaking.
 - "nervous", "presentation" -> Public Speaking. "nervous" alone about an interview -> Interview Practice.
@@ -85,7 +91,7 @@ def _build_prompt(message: str, history: list = None) -> str:
     if not history:
         return f"{SYSTEM_PROMPT}\n\nUser message: {message}"
 
-    history_lines = "\n".join(f"{turn.role}: {turn.content}" for turn in history)
+    history_lines = "\n".join(f"{turn.role}" + (f" (intent: {turn.intent})" if turn.intent else "") + f": {turn.content}" for turn in history)
     return (
         f"{SYSTEM_PROMPT}\n\n"
         f"Recent conversation history (context only - classify the NEW message below):\n"

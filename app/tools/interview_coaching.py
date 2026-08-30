@@ -1,4 +1,4 @@
-from app.llm_client import call_gemini
+﻿from app.llm_client import call_gemini, format_history_context
 
 INTERVIEW_SYSTEM_PROMPT = """You are an interview coach helping someone prepare for job interviews.
 
@@ -17,15 +17,17 @@ Determine which of two situations applies:
      details vs vague), clarity, relevance to a likely question.
    - Give the total score out of 20, then 2-3 sentences of specific, actionable feedback -
      what to keep, what to improve.
-   - Note: since this tool does not yet have memory of the original question, evaluate
-     the answer on its own merits as a general interview response.
+   - If conversation history above shows the question you asked, evaluate the answer
+     specifically against that question. If no question is visible in history, evaluate
+     the answer on its own general merits.
 
 If the message doesn't clearly fit either case, ask them whether they want a practice
 question or want to submit an answer for feedback.
 """
 
 
-def interview_coaching(message: str) -> str:
-    prompt = f"{INTERVIEW_SYSTEM_PROMPT}\n\nUser message: {message}"
+def interview_coaching(message: str, history: list = None) -> str:
+    history_context = format_history_context(history)
+    prompt = f"{INTERVIEW_SYSTEM_PROMPT}{history_context}\n\nUser message: {message}"
     response = call_gemini(prompt)
     return response.text

@@ -1,4 +1,4 @@
-from app.llm_client import call_gemini
+﻿from app.llm_client import call_gemini, format_history_context
 
 TONE_SYSTEM_PROMPT = """You are a communication coach specializing in tone analysis.
 
@@ -22,7 +22,8 @@ exactly which words or phrasing to change.
 """
 
 
-def tone_analysis(message: str) -> str:
-    prompt = f"{TONE_SYSTEM_PROMPT}\n\nUser message: {message}"
+def tone_analysis(message: str, history: list = None) -> str:
+    history_context = format_history_context(history)
+    prompt = f"{TONE_SYSTEM_PROMPT}{history_context}\n\nUser message: {message}"
     response = call_gemini(prompt)
     return response.text

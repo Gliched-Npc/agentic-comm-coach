@@ -38,7 +38,7 @@ def chat(payload: UserMessageRequest):
         history = get_history(session_id) if payload.session_id else []
         intent_result = classify_intent(user_text, history=history)
         tool_handler = TOOL_REGISTRY.get(intent_result.intent, handle_unclear)
-        result = tool_handler(user_text, intent_result.intent, session_id)
+        result = tool_handler(user_text, intent_result.intent, session_id, history)
 
         append_turn(session_id, "user", user_text, intent=intent_result.intent.value)
         append_turn(session_id, "assistant", result.response, intent=intent_result.intent.value)

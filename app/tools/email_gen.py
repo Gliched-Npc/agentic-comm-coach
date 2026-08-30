@@ -1,4 +1,4 @@
-from app.llm_client import call_gemini
+﻿from app.llm_client import call_gemini, format_history_context
 
 EMAIL_SYSTEM_PROMPT = """You are an executive communication coach specializing in workplace email strategy and drafting.
 
@@ -25,7 +25,8 @@ Deliver direct, high-impact responses without meta-introductions.
 """
 
 
-def generate_email(message: str) -> str:
-    prompt = f"{EMAIL_SYSTEM_PROMPT}\n\nUser message: {message}"
+def generate_email(message: str, history: list = None) -> str:
+    history_context = format_history_context(history)
+    prompt = f"{EMAIL_SYSTEM_PROMPT}{history_context}\n\nUser request: {message}"
     response = call_gemini(prompt)
     return response.text
