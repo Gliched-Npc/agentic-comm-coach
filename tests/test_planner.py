@@ -1,4 +1,3 @@
-
 from app.planner import classify_intent
 
 TEST_MESSAGES = {
@@ -53,6 +52,6 @@ for expected, messages in TEST_MESSAGES.items():
         match = "PASS" if result.intent.value == expected else "FAIL"
         if match == "PASS":
             correct += 1
-        print(f"{match} | expected={expected} got={result.intent.value} conf={result.confidence} | {msg}")
+        print(f"{match} | expected={expected} got={result.intent.value} conf={result.confidence_level} | {msg}")
 
 print(f"\n{correct}/{total} correct ({correct/total*100:.0f}%)")
