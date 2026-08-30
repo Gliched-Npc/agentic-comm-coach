@@ -1,13 +1,16 @@
 ﻿import uuid
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Literal
 from google.genai.errors import ServerError, ClientError
 from app.planner import classify_intent
 from app.tools.router import TOOL_REGISTRY, handle_unclear
+from app.tools.grammar_correction import grammar_correction
+from app.tools.tone_analysis import tone_analysis
+from app.tools.conversation_improvement import conversation_improvement
 from app.tools.communication_scoring import score_communication
 from app.memory import get_history, append_turn
-from app.schemas import CoachResponse, Intent, ScoringResult, ChatTurn
+from app.schemas import CoachResponse, Intent, ScoringResult, ChatTurn, ImproveResponse
 
 app = FastAPI(title="Agentic Communication Coach")
 
@@ -19,6 +22,10 @@ class UserMessageRequest(BaseModel):
 
 class AnalyzeRequest(BaseModel):
     text: str
+
+class ImproveRequest(BaseModel):
+    text: str
+    improvement_type: Literal["grammar", "tone", "conversation"]
 
 
 @app.get("/")
@@ -71,6 +78,30 @@ def analyze(payload: AnalyzeRequest):
 
     try:
         return score_communication(text)
+
+    except (ClientError, ServerError):
+        raise HTTPException(
+            status_code=503,
+            detail="I'm getting a lot of requests right now. Please try again in a moment."
+        )
+
+
+@app.post("/coach/improve", response_model=ImproveResponse)
+def improve(payload: ImproveRequest):
+    text = payload.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Text cannot be empty.")
+
+    dispatch = {
+        "grammar": grammar_correction,
+        "tone": tone_analysis,
+        "conversation": conversation_improvement,
+    }
+    tool_fn = dispatch[payload.improvement_type]
+
+    try:
+        result_text = tool_fn(text)
+        return ImproveResponse(result=result_text, improvement_type=payload.improvement_type)
 
     except (ClientError, ServerError):
         raise HTTPException(

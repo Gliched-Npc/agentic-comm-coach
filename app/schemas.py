@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+﻿from pydantic import BaseModel
 from typing import Optional, List, Literal
 from enum import Enum
 
@@ -35,6 +35,11 @@ class CoachResponse(BaseModel):
     session_id: str
     clarify_pending: bool = False
     awaiting_followup: bool = False 
+
+
+class ImproveResponse(BaseModel):
+    result: str
+    improvement_type: str
 
 
 class ChatTurn(BaseModel):
