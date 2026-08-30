@@ -1,16 +1,21 @@
-﻿from fastapi import FastAPI, HTTPException
+﻿import uuid
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 from google.genai.errors import ServerError, ClientError
 from app.planner import classify_intent
 from app.tools.router import TOOL_REGISTRY, handle_unclear
 from app.tools.communication_scoring import score_communication
-from app.schemas import CoachResponse, Intent,ScoringResult
+from app.memory import get_history, append_turn
+from app.schemas import CoachResponse, Intent, ScoringResult
 
 app = FastAPI(title="Agentic Communication Coach")
 
 
 class UserMessageRequest(BaseModel):
     message: str
+    session_id: Optional[str] = None
+
 
 class AnalyzeRequest(BaseModel):
     text: str
@@ -27,18 +32,28 @@ def chat(payload: UserMessageRequest):
     if not user_text:
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
+    session_id = payload.session_id or str(uuid.uuid4())
+
     try:
-        intent_result = classify_intent(user_text)
+        history = get_history(session_id) if payload.session_id else []
+        intent_result = classify_intent(user_text, history=history)
         tool_handler = TOOL_REGISTRY.get(intent_result.intent, handle_unclear)
-        return tool_handler(user_text,intent_result.intent)
+        result = tool_handler(user_text, intent_result.intent, session_id)
+
+        append_turn(session_id, "user", user_text, intent=intent_result.intent.value)
+        append_turn(session_id, "assistant", result.response, intent=intent_result.intent.value)
+
+        return result
 
     except (ClientError, ServerError):
         return CoachResponse(
             response="I'm getting a lot of requests right now. Please try again in a moment.",
             intent=Intent.UNCLEAR,
+            session_id=session_id,
             clarify_pending=False,
             awaiting_followup=False,
         )
+
 
 @app.post("/coach/analyze", response_model=ScoringResult)
 def analyze(payload: AnalyzeRequest):

@@ -1,4 +1,4 @@
-# app/tools/router.py
+﻿# app/tools/router.py
 from typing import Callable, Dict
 from app.schemas import Intent, CoachResponse
 from app.tools.email_gen import generate_email
@@ -8,54 +8,59 @@ from app.tools.conversation_improvement import conversation_improvement
 from app.tools.grammar_correction import grammar_correction
 
 
-def handle_email_writing(message: str,intent:Intent) -> CoachResponse:
+def handle_email_writing(message: str,intent:Intent, session_id: str) -> CoachResponse:
     result = generate_email(message)
     return CoachResponse(
         response=result,
         intent=intent,
+        session_id=session_id,
         clarify_pending=False,
         awaiting_followup=False
     )
 
-def handle_interview_practice(message: str,intent:Intent) -> CoachResponse:
+def handle_interview_practice(message: str,intent:Intent, session_id: str) -> CoachResponse:
     result = interview_coaching(message)
     return CoachResponse(
         response=result,
         intent=intent,
+        session_id=session_id,
         clarify_pending=False,
         awaiting_followup=True
     )
 
 
-def handle_tone_improvement(message: str,intent:Intent) -> CoachResponse:
+def handle_tone_improvement(message: str,intent:Intent, session_id: str) -> CoachResponse:
     result = tone_analysis(message)
     return CoachResponse(
         response=result,
         intent=intent,
+        session_id=session_id,
         clarify_pending=False,
         awaiting_followup=False
     )
 
 
-def handle_conversation_improvement(message: str,intent:Intent) -> CoachResponse:
+def handle_conversation_improvement(message: str,intent:Intent, session_id: str) -> CoachResponse:
     result = conversation_improvement(message)
     return CoachResponse(
         response=result,
         intent=intent,
+        session_id=session_id,
         clarify_pending=False,
         awaiting_followup=False
     )
 
-def handle_grammar_correction(message:str,intent:Intent) -> CoachResponse:
+def handle_grammar_correction(message:str,intent:Intent, session_id: str) -> CoachResponse:
     result = grammar_correction(message)
     return CoachResponse(
         response=result,
         intent=intent,
+        session_id=session_id,
         clarify_pending=False,
         awaiting_followup=False
     )
 
-def handle_unclear(message: str,intent:Intent) -> CoachResponse:
+def handle_unclear(message: str,intent:Intent, session_id: str) -> CoachResponse:
     return CoachResponse(
         response=(
         "I'm not quite sure what kind of communication help you're looking for.\n\n"
@@ -65,11 +70,12 @@ def handle_unclear(message: str,intent:Intent) -> CoachResponse:
         "- Do you want feedback on how something comes across?"
         ),
         intent=intent,
+        session_id=session_id,
         clarify_pending=True,
         awaiting_followup=False
     )
 
-TOOL_REGISTRY: Dict[Intent, Callable[[str,Intent], CoachResponse]] = {
+TOOL_REGISTRY: Dict[Intent, Callable[[str,Intent,str], CoachResponse]] = {
     Intent.EMAIL_WRITING: handle_email_writing,
     Intent.INTERVIEW_PRACTICE: handle_interview_practice,
     Intent.TONE_IMPROVEMENT: handle_tone_improvement,

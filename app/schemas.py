@@ -32,6 +32,7 @@ class ScoringResult(BaseModel):
 class CoachResponse(BaseModel):
     response: str
     intent: Intent
+    session_id: str
     clarify_pending: bool = False
     awaiting_followup: bool = False 
 
