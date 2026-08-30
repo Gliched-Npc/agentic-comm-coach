@@ -20,32 +20,20 @@ class IntentResult(BaseModel):
     confidence_level: Literal["low", "medium", "high"]
 
 
-class PlanStep(BaseModel):
+class ScoringResult(BaseModel):
     reasoning: str
-    tool: str
-    input: str
-    step: int
-
-
-class Plan(BaseModel):
-    plan: List[PlanStep]
-
-
-class ScoreBreakdown(BaseModel):
-    clarity: Optional[int] = None
-    structure: Optional[int] = None
-    specificity: Optional[int] = None
-    tone: Optional[int] = None
-    grammar: Optional[int] = None
-    conciseness: Optional[int] = None
+    clarity: int
+    tone: int
+    grammar: int
+    conciseness: int
+    feedback: str
 
 
 class CoachResponse(BaseModel):
     response: str
     intent: Intent
-    score: Optional[ScoreBreakdown] = None
     clarify_pending: bool = False
-    awaiting_followup: bool = False
+    awaiting_followup: bool = False 
 
 
 class ChatTurn(BaseModel):

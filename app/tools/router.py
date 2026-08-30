@@ -5,6 +5,7 @@ from app.tools.email_gen import generate_email
 from app.tools.interview_coaching import interview_coaching
 from app.tools.tone_analysis import tone_analysis
 from app.tools.conversation_improvement import conversation_improvement
+from app.tools.grammar_correction import grammar_correction
 
 
 def handle_email_writing(message: str,intent:Intent) -> CoachResponse:
@@ -45,6 +46,15 @@ def handle_conversation_improvement(message: str,intent:Intent) -> CoachResponse
         awaiting_followup=False
     )
 
+def handle_grammar_correction(message:str,intent:Intent) -> CoachResponse:
+    result = grammar_correction(message)
+    return CoachResponse(
+        response=result,
+        intent=intent,
+        clarify_pending=False,
+        awaiting_followup=False
+    )
+
 def handle_unclear(message: str,intent:Intent) -> CoachResponse:
     return CoachResponse(
         response=(
@@ -66,5 +76,6 @@ TOOL_REGISTRY: Dict[Intent, Callable[[str,Intent], CoachResponse]] = {
     Intent.PUBLIC_SPEAKING: handle_conversation_improvement,
     Intent.CONFLICT_RESOLUTION: handle_conversation_improvement,
     Intent.CUSTOMER_COMMUNICATION: handle_conversation_improvement,
+    Intent.GRAMMAR_CORRECTION: handle_grammar_correction,
     Intent.UNCLEAR: handle_unclear,
 }
