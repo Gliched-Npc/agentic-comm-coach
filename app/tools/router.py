@@ -60,6 +60,16 @@ def handle_grammar_correction(message:str,intent:Intent, session_id: str, histor
         awaiting_followup=False
     )
 
+def handle_small_talk(message: str, intent: Intent, session_id: str, history: list = None) -> CoachResponse:
+    lower = message.lower()
+    if "thank" in lower:
+        response = "You're welcome! Let me know if there's anything else you'd like help with."
+    elif "bye" in lower or "goodbye" in lower:
+        response = "Take care! Come back anytime you need help with communication."
+    else:
+        response = "Happy to help! Let me know what you'd like to work on."
+    return CoachResponse(response=response, intent=intent, session_id=session_id, clarify_pending=False, awaiting_followup=False)
+
 def handle_unclear(message: str,intent:Intent, session_id: str, history: List[ChatTurn] = None) -> CoachResponse:
     return CoachResponse(
         response=(
@@ -83,5 +93,6 @@ TOOL_REGISTRY: Dict[Intent, Callable[[str,Intent,str], CoachResponse]] = {
     Intent.CONFLICT_RESOLUTION: handle_conversation_improvement,
     Intent.CUSTOMER_COMMUNICATION: handle_conversation_improvement,
     Intent.GRAMMAR_CORRECTION: handle_grammar_correction,
+    Intent.SMALL_TALK: handle_small_talk,
     Intent.UNCLEAR: handle_unclear,
 }

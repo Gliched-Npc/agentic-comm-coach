@@ -19,7 +19,7 @@ SYSTEM_PROMPT = """You are an intent classifier for a communication coaching age
 
 First explain your reasoning, then classify into exactly one of:
 Email Writing, Interview Practice, Grammar Correction, Tone Improvement,
-Public Speaking, Conflict Resolution, Customer Communication, unclear.
+Public Speaking, Conflict Resolution, Customer Communication, Small Talk, unclear.
 
 Confidence level (use these, don't guess):
 - high: message clearly and uniquely matches one intent, unambiguous keywords
@@ -64,6 +64,9 @@ Examples:
 "Help me practice answering 'What's your biggest weakness?'" -> Interview Practice, confidence_level high
 "Write a follow-up email to a client who hasn't responded in two weeks" -> Email Writing, confidence_level high
 "I want to talk to my manager about something that's been bothering me" -> Conflict Resolution, confidence_level medium
+"Thank you so much, that helps a lot!" -> Small Talk, confidence_level high
+"ok great, thanks" -> Small Talk, confidence_level high
+"hi there" -> Small Talk, confidence_level high
 "I don't really know how to say this..." -> unclear, confidence_level low
 "Draft a message to a client explaining a price increase" -> Customer Communication, confidence_level high
 """
@@ -76,6 +79,7 @@ INTENT_KEYWORDS = {
     "Public Speaking": ["speech", "presentation", "speaking", "public speaking", "public talk"],
     "Conflict Resolution": ["conflict", "disagreement", "argument", "coworker", "higher authority", "subordinate"],
     "Customer Communication": ["customer", "client", "support ticket"],
+    "Small Talk": ["thank", "thanks", "thank you", "hi", "hello", "hey", "bye", "goodbye", "sounds good", "got it", "no worries", "appreciate it"],
     "unclear": [],
 }
 

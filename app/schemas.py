@@ -11,6 +11,7 @@ class Intent(str, Enum):
     PUBLIC_SPEAKING = "Public Speaking"
     CONFLICT_RESOLUTION = "Conflict Resolution"
     CUSTOMER_COMMUNICATION = "Customer Communication"
+    SMALL_TALK = "Small Talk"
     UNCLEAR = "unclear"
 
 
